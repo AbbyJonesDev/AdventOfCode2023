@@ -204,10 +204,31 @@ sample_result2 = 2286
 ```
 
 ```elixir
-get_result_two = fn str ->
-  get_result.(str)
+# for each game
+# - the smallest number of each color that would work (or - the largest number of each color)
+# - those three values multipled together
+# and then the sums added up
+
+get_max_for_color = fn str, color ->
+  Regex.scan(~r/(\d+) #{color}/, str)
+  |> Enum.map(fn [_, num] -> String.to_integer(num) end)
+  |> Enum.max()
 end
 
-# DayOnePartTwo.get_result(sample_input2)
+get_power_for_game = fn str ->
+  get_max_for_color.(str, "red") * get_max_for_color.(str, "blue") *
+    get_max_for_color.(str, "green")
+end
+```
+
+```elixir
+get_result_two = fn str ->
+  str
+  |> String.split("\n", trim: true)
+  |> Stream.map(fn game -> get_power_for_game.(game) end)
+  |> Enum.sum()
+end
+
+# get_result_two.(sample_input)
 get_result_two.(input)
 ```
